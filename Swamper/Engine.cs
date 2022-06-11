@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 namespace Swamper;
 
 internal class Engine
@@ -6,6 +7,8 @@ internal class Engine
     private readonly int _threads;
     private readonly TimeSpan _lengthOfTimeToRun;
     private readonly Stopwatch _sw = new();
+    private readonly ConcurrentQueue<JobResult> _queue = new();
+    private readonly HttpClient _httpClient = new();
 
     internal Engine(int threads, TimeSpan lengthOfTimeToRun)
     {
@@ -25,6 +28,7 @@ internal class Engine
         _sw.Start();
         var events = TriggerThreads();
         WaitForThreadCompletion(events);
+        new Result().ParseAllResults(_queue);
     }
 
     private static void WaitForThreadCompletion(IReadOnlyCollection<ManualResetEventSlim> events)
@@ -55,7 +59,7 @@ internal class Engine
         HttpClientConnection job;
         try
         {
-            job = await new HttpClientConnection(new Uri("https://google.com")).Initialise();
+            job = await new HttpClientConnection(new Uri("https://google.com"), _httpClient).Initialise();
         }
         catch (Exception)
         {
@@ -80,6 +84,7 @@ internal class Engine
             }
         }
 
+        _queue.Enqueue(job.GetResults());
         resetEvent.Set();
     }
 }
