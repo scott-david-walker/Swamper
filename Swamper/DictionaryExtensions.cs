@@ -1,8 +1,10 @@
-﻿namespace Swamper;
+﻿using System.Collections.Concurrent;
 
-public static class DictionaryExtensions<T>
+namespace Swamper;
+
+internal static class DictionaryExtensions<T> where T : notnull
 {
-    public static void AddOrUpdateCount(Dictionary<T, int> dict, T val)
+    internal static void AddOrUpdateCount(ConcurrentDictionary<T, int> dict, T val)
     {
         if (dict.ContainsKey(val))
         {
@@ -10,10 +12,10 @@ public static class DictionaryExtensions<T>
             return;
         }
 
-        dict.Add(val, 1);
+        dict.TryAdd(val, 1);
     }
     
-    public static void MergeDictionaries(IDictionary<T, int> dict1, IDictionary<T, int> dict2)
+    internal static void MergeDictionaries(ConcurrentDictionary<T, int> dict1, ConcurrentDictionary<T, int> dict2)
     {
         foreach (var kvp2 in dict2)
         {
@@ -22,8 +24,8 @@ public static class DictionaryExtensions<T>
                 dict1[kvp2.Key] += kvp2.Value;
                 continue;
             }
-            
-            dict1.Add(kvp2);
+
+            dict1.TryAdd(kvp2.Key, kvp2.Value);
         }
     }
 }

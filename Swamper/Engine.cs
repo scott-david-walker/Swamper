@@ -6,14 +6,15 @@ internal class Engine
 {
     private readonly int _threads;
     private readonly TimeSpan _lengthOfTimeToRun;
+    private readonly HttpClientConnection _clientConnection;
     private readonly Stopwatch _sw = new();
     private readonly ConcurrentQueue<JobResult> _queue = new();
-    private readonly HttpClient _httpClient = new();
 
-    internal Engine(int threads, TimeSpan lengthOfTimeToRun)
+    internal Engine(int threads, TimeSpan lengthOfTimeToRun, HttpClientConnection clientConnection)
     {
         _threads = threads;
         _lengthOfTimeToRun = lengthOfTimeToRun;
+        _clientConnection = clientConnection;
     }
     
     private readonly ILogger _logger = new ConsoleLogger();
@@ -46,8 +47,8 @@ internal class Engine
         for (var i = 0; i < _threads; i++)
         {
             var resetEvent = new ManualResetEventSlim(false);
-            var thread = new Thread(async (_) => await Work(resetEvent));
-            thread.Start(i);
+            var thread = new Thread(async () => await Work(resetEvent));
+            thread.Start();
             events.Add(resetEvent);
         }
 
@@ -59,7 +60,7 @@ internal class Engine
         HttpClientConnection job;
         try
         {
-            job = await new HttpClientConnection(new Uri("https://google.com"), _httpClient).Initialise();
+            job = await _clientConnection.Initialise();
         }
         catch (Exception)
         {
@@ -72,11 +73,13 @@ internal class Engine
 
     private async Task RunUntilTimerEnd(ManualResetEventSlim resetEvent, HttpClientConnection job)
     {
+        
         while (_lengthOfTimeToRun.TotalMilliseconds > _sw.Elapsed.TotalMilliseconds)
         {
             try
             {
                 await job.Connect();
+                
             }
             catch (Exception ex)
             {

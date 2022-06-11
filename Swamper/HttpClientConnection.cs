@@ -4,26 +4,29 @@ namespace Swamper;
 
 public class HttpClientConnection
 {
-    private readonly Uri _uri;
+    private readonly HttpRequestMessage _httpRequestMessage;
     private readonly HttpClient _httpClient;
-    private readonly ILogger _logger = new ConsoleLogger();
     private JobResult? _result;
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-    public HttpClientConnection(Uri uri, HttpClient  httpClient)
+    public HttpClientConnection(HttpRequestMessage httpRequestMessage, HttpClient httpClient)
     {
-        _uri = uri;
+        _httpRequestMessage = httpRequestMessage;
         _httpClient = httpClient;
     }
+    
     internal ValueTask<HttpClientConnection> Initialise()
     {
-        _result = new JobResult();
-        return new ValueTask<HttpClientConnection>(Task.FromResult(this));
+        return new ValueTask<HttpClientConnection>(
+            Task.FromResult(new HttpClientConnection(_httpRequestMessage, _httpClient)
+        {
+            _result = new JobResult()
+        }));
     }
 
     internal async ValueTask Connect()
     {
         _stopwatch.Restart();
-        using var response = await _httpClient.GetAsync(_uri);
+        using var response = await _httpClient.SendAsync(await HttpRequestCloner.Clone(_httpRequestMessage));
         _result!.Push(response.StatusCode, _stopwatch.ElapsedMilliseconds);
     }
 
