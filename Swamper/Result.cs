@@ -6,12 +6,12 @@ namespace Swamper;
 public class Result
 {
     internal ConcurrentDictionary<HttpStatusCode, int> StatusCodes { get;  } = new();
-    internal double AverageTimePerRequest => CalculateAverage(); 
+    public double AverageTimePerRequest => CalculateAverage(); 
 
-    internal int NumberOfRequests => StatusCodes.Select(t => t.Value).Sum();
-    internal double MaximumRequestTime { get; set; }
-    internal double MinimumRequestTime { get; set; } = 1000000; // Large number so 1st request should be lower
-    internal double MedianRequestTime => CalculateMedian();
+    public int NumberOfRequests => StatusCodes.Select(t => t.Value).Sum();
+    public double MaximumRequestTime { get; set; }
+    public double MinimumRequestTime { get; set; } = 1000000; // Large number so 1st request should be lower
+    public double MedianRequestTime => CalculateMedian();
     private long OverallMilliseconds { get; set; }
     private List<long> MillisecondsPerRequest { get; } = new();
 
