@@ -4,6 +4,18 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Version>0.0.2-alpha.1</Version>
+        <PackageId>Swamper</PackageId>
+        <Title>Swamper</Title>
+        <Authors>Scott Walker</Authors>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <!-- <icon>icon.png</icon> -->
+        <PackageProjectUrl>https://github.com/scott-david-walker/Swamper</PackageProjectUrl>
+        <Description>Simple Load Testing Library</Description>
+<!--        <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>-->
+        <Copyright>$copyright$</Copyright>
+        <PackageTags>LoadTesting</PackageTags>
     </PropertyGroup>
 
 </Project>
