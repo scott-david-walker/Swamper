@@ -18,17 +18,17 @@ internal class Engine
     
     private readonly ILogger _logger = new ConsoleLogger();
     private const int MaxWaitHandles = 64; //Maximum of library
-    internal Task Run()
+    internal Task<Result> Run()
     {
         return Task.Run(Start);
     }
 
-    private void Start()
+    private Result Start()
     {
         _sw.Start();
         var events = TriggerThreads();
         WaitForThreadCompletion(events);
-        new Result().ParseAllResults(_queue);
+        return new Result().ParseAllResults(_queue);
     }
 
     private static void WaitForThreadCompletion(IReadOnlyCollection<ManualResetEventSlim> events)
