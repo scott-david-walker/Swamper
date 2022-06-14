@@ -17,7 +17,9 @@ public static class Swamper
     }
     public static async Task Swamp(HttpRequestMessage message, int threads, int lengthOfTimeInSeconds, IPresenter presenter)
     {
-        var result = await new Engine(threads, TimeSpan.FromSeconds(lengthOfTimeInSeconds), new HttpClientConnection(message, new HttpClient())).Run();
+        var source = new CancellationTokenSource();
+        source.CancelAfter(TimeSpan.FromSeconds(lengthOfTimeInSeconds));
+        var result = await new Engine(threads, new HttpClientConnection(message, new HttpClient()), source.Token).Run();
         presenter.Present(result);
     }
 }
