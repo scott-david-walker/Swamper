@@ -5,23 +5,23 @@ namespace Swamper;
 internal class Engine
 {
     private readonly int _threads;
-    private readonly TimeSpan _lengthOfTimeToRun;
+    private readonly CancellationToken _token;
     private readonly HttpClientConnection _clientConnection;
     private readonly Stopwatch _sw = new();
     private readonly ConcurrentQueue<JobResult> _queue = new();
 
-    internal Engine(int threads, TimeSpan lengthOfTimeToRun, HttpClientConnection clientConnection)
+    internal Engine(int threads, HttpClientConnection clientConnection,  CancellationToken token)
     {
         _threads = threads;
-        _lengthOfTimeToRun = lengthOfTimeToRun;
         _clientConnection = clientConnection;
+        _token = token;
     }
     
     private readonly ILogger _logger = new ConsoleLogger();
     private const int MaxWaitHandles = 64; //Maximum of library
     internal Task<Result> Run()
     {
-        return Task.Run(Start);
+        return Task.Run(Start, _token);
     }
 
     private Result Start()
@@ -74,7 +74,7 @@ internal class Engine
     private async Task RunUntilTimerEnd(ManualResetEventSlim resetEvent, HttpClientConnection job)
     {
         
-        while (_lengthOfTimeToRun.TotalMilliseconds > _sw.Elapsed.TotalMilliseconds)
+        while (!_token.IsCancellationRequested)
         {
             try
             {
