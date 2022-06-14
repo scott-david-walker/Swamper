@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.0.2-alpha.1</Version>
+        <Version>0.0.2-alpha.2</Version>
         <PackageId>Swamper</PackageId>
         <Title>Swamper</Title>
         <Authors>Scott Walker</Authors>
